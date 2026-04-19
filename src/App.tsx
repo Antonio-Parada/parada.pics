@@ -1,10 +1,35 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import CameraMedium from './CameraMedium'
 import './App.css'
 import galleryData from './gallery_compiled.json'
 
 function App() {
   const [isPhosphor, setIsPhosphor] = useState(false);
+  const [category, setCategory] = useState<'PUBLIC' | 'PRIVATE'>('PUBLIC');
+  const [isAuthorized, setIsAuthorized] = useState(false);
+
+  // Persistence: Check if already authorized on mount
+  useEffect(() => {
+    const auth = localStorage.getItem('pixels_authorized');
+    if (auth === 'true') {
+      setIsAuthorized(true);
+    }
+  }, []);
+
+  const handlePrivateClick = () => {
+    if (isAuthorized) {
+      setCategory('PRIVATE');
+    } else {
+      const password = prompt('ENTER ACCESS KEY:');
+      if (password === 'pixels2026') { // Placeholder password
+        localStorage.setItem('pixels_authorized', 'true');
+        setIsAuthorized(true);
+        setCategory('PRIVATE');
+      } else {
+        alert('ACCESS DENIED: INVALID KEY');
+      }
+    }
+  };
 
   const copyToClipboard = (text: string) => {
     if (navigator.clipboard && window.isSecureContext) {
@@ -30,6 +55,13 @@ function App() {
     }
   };
 
+  // Logic: Display even IDs as Public, odd as Private for demonstration
+  // In the future, you can add a 'category' field to your compiler.py
+  const filteredData = galleryData.filter((_, index) => {
+    if (category === 'PUBLIC') return index % 2 === 0;
+    return index % 2 !== 0;
+  });
+
   return (
     <div className="pics-container">
       <header className="pics-header">
@@ -45,16 +77,25 @@ function App() {
       </header>
 
       <nav className="category-bar">
-        <span className="active">LATEST</span>
-        <span>STOWE_VT</span>
-        <span>METROPOLIS</span>
-        <span>NATURE</span>
-        <span>EXPERIMENTAL</span>
-        <span style={{marginLeft: 'auto', color: 'var(--pixels-cyan)'}}>SIGNAL_ACTIVE</span>
+        <span 
+          className={category === 'PUBLIC' ? 'active' : ''} 
+          onClick={() => setCategory('PUBLIC')}
+        >
+          PUBLIC_SIGNALS
+        </span>
+        <span 
+          className={category === 'PRIVATE' ? 'active' : ''} 
+          onClick={handlePrivateClick}
+        >
+          PRIVATE_ENCLAVE {isAuthorized ? '✓' : '🔒'}
+        </span>
+        <span style={{marginLeft: 'auto', color: 'var(--pixels-cyan)'}}>
+          MODE: {category}
+        </span>
       </nav>
 
       <main className="pics-gallery">
-        {galleryData.map((img, index) => (
+        {filteredData.map((img, index) => (
           <div key={img.id} className="pics-item">
             <CameraMedium 
               ascii={img.ascii} 
@@ -64,7 +105,7 @@ function App() {
             <div className="pics-meta">
               <div className="meta-info">
                 <h3>{img.name.replace('.JPG', '')}</h3>
-                <p>BLOCK_ARRAY_0{index + 1} // ARCHIVED_2026</p>
+                <p>BLOCK_ARRAY_0{index + 1} // {category}_SIGNAL</p>
               </div>
               <div className="action-btns">
                 <button 
