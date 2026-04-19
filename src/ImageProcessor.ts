@@ -13,6 +13,8 @@ export const processImage = (
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    // MONOSPACE ASPECT CORRECTION
+    // $ sign is roughly 0.6 as wide as it is tall
     const fontAspectRatio = 0.55; 
     const height = Math.floor((img.height / img.width) * width * fontAspectRatio);
     
@@ -26,7 +28,6 @@ export const processImage = (
     let maxLum = 0;
     const rawLuminances: number[] = [];
 
-    // Step 1: Perceptual Luminance extraction
     for (let i = 0; i < imageData.length; i += 4) {
       const r = imageData[i];
       const g = imageData[i + 1];
@@ -37,8 +38,6 @@ export const processImage = (
       if (lum > maxLum) maxLum = lum;
     }
 
-    // Step 2: Dynamic Normalization (Autolevels)
-    // Ensures every image utilizes the full 0-255 range
     const data: number[][] = [];
     const range = maxLum - minLum || 1;
 
@@ -46,12 +45,9 @@ export const processImage = (
       const row: number[] = [];
       for (let x = 0; x < width; x++) {
         const lum = rawLuminances[y * width + x];
-        
-        // Stretch the luminance to fill 0-255
         let normalized = ((lum - minLum) / range) * 255;
 
-        // Apply a gentle S-Curve for mid-tone separation
-        // This sharpens details without blowing out highs/lows
+        // Apply S-Curve
         const s = normalized / 255;
         normalized = (s < 0.5 ? 2 * s * s : 1 - Math.pow(-2 * s + 2, 2) / 2) * 255;
 
@@ -65,8 +61,7 @@ export const processImage = (
 };
 
 export const getCharForLuminance = (l: number): string => {
-  // Balanced ramp for high-contrast B&W photography
-  const chars = "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\\|()1{}[]?-_+~<>i!lI;:,\"^`'. ";
-  const index = Math.floor(((255 - l) / 255) * (chars.length - 1));
-  return chars[index];
+  // "$" ONLY DENSITY MAP
+  // Using space for zero-light and "$" for light to create high-contrast pointillism
+  return l > 127 ? "$" : " ";
 };
