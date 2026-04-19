@@ -63,9 +63,8 @@ function App() {
     }
   };
 
-  const filteredData = galleryData.filter((_, index) => {
-    if (category === 'PUBLIC') return index % 2 === 0;
-    return index % 2 !== 0;
+  const filteredData = galleryData.filter((img) => {
+    return img.category === category;
   });
 
   return (
