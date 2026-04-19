@@ -14,15 +14,19 @@ const CameraMedium: React.FC<CameraMediumProps> = ({ ascii }) => {
     if (!ascii || !containerRef.current) return;
 
     try {
+      // Get the calculated font size from the browser (the fluid 'vw' value)
+      const computedStyle = window.getComputedStyle(containerRef.current);
+      const fontSize = parseFloat(computedStyle.fontSize);
+
       const prepared = Pretext.prepare(
         ascii, 
-        "6px 'Courier New', Courier, monospace"
+        `${fontSize}px 'Courier New', Courier, monospace`
       );
 
       const layout = Pretext.layout(
         prepared, 
         containerRef.current.clientWidth, 
-        6 
+        fontSize // Match line height to font size for high density
       );
       
       setLayoutHeight(layout.height);
