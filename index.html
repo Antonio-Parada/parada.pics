@@ -2,11 +2,16 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Parada Pics - parada.pics</title>
+    <link rel="icon" type="image/png" href="/missingno.png" />
+    <!-- Fix initial zoom and prevent user scaling from breaking the ASCII grid -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>PARADA.PICS | ARCHIVE</title>
+
+    <meta name="description" content="High-density ASCII archival. Photography rendered as light." />
+    <meta property="og:image" content="https://parada.buzz/og_image.png" />
+    <meta name="theme-color" content="#ff9900" /> <!-- High-contrast highlight -->
   </head>
-  <body style="background-color: #000;">
+  <body style="background-color: #000; margin: 0; padding: 0;">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

@@ -1,101 +1,158 @@
 :root {
+  --portal-orange: #ff9900;
+  --portal-grey: #1b1b1b;
+  --portal-text: #ccc;
   --pixels-green: #00ff00;
-  --pixels-black: #000000;
-  --pixels-white: #ffffff;
-  --pixels-grey: #222;
 }
 
 body {
   margin: 0;
   padding: 0;
-  background-color: var(--pixels-black);
-  color: var(--pixels-white);
-  font-family: 'Courier New', Courier, monospace;
+  background-color: #000;
+  color: #fff;
+  font-family: Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
 }
 
 .pics-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 40px 20px;
+  width: 100%;
 }
 
+/* Header */
 .pics-header {
-  border-bottom: 1px solid var(--pixels-grey);
-  padding-bottom: 20px;
-  margin-bottom: 60px;
+  background-color: #000;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  border-bottom: 2px solid var(--portal-grey);
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
 .pics-header h1 {
-  font-size: 32px;
+  font-size: 24px;
   margin: 0;
-  letter-spacing: 4px;
+  color: #fff;
+  font-weight: bold;
+  letter-spacing: -1px;
 }
 
-.pics-header p {
-  font-size: 12px;
-  color: var(--pixels-green);
-  margin: 10px 0 0;
+.pics-header h1 span {
+  background-color: var(--portal-orange);
+  color: #000;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 2px;
 }
 
-.pics-gallery {
+/* Category Bar */
+.category-bar {
+  background-color: #222;
+  padding: 8px 20px;
   display: flex;
-  flex-direction: column;
-  gap: 80px;
+  gap: 15px;
+  font-size: 13px;
+  color: var(--portal-text);
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.category-bar span:hover {
+  color: #fff;
+  cursor: pointer;
+}
+
+/* Gallery Grid */
+.pics-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 15px;
+  padding: 20px;
 }
 
 .pics-item {
-  border: 1px solid var(--pixels-grey);
-  background-color: #050505;
-  position: relative;
+  background-color: var(--portal-grey);
+  border-radius: 4px;
   overflow: hidden;
+  position: relative;
+  transition: transform 0.2s ease;
+}
+
+.pics-item:hover {
+  transform: scale(1.02);
 }
 
 .camera-render {
-  text-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
-  transition: text-shadow 0.3s ease;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 6px; /* High density */
+  line-height: 1;
+  white-space: pre;
+  background-color: #000;
+  color: #fff;
+  width: 100%;
+  aspect-ratio: 16/9;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 0;
 }
 
-.pics-item:hover .camera-render {
-  text-shadow: 0 0 8px rgba(0, 255, 0, 0.4);
-  color: var(--pixels-green) !important;
-}
-
-/* Scanline Effect */
-.pics-item::after {
-  content: " ";
-  display: block;
+/* Labels */
+.duration-label {
   position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
-  z-index: 2;
-  background-size: 100% 2px, 3px 100%;
-  pointer-events: none;
+  bottom: 45px;
+  right: 5px;
+  background: rgba(0,0,0,0.8);
+  padding: 2px 4px;
+  font-size: 10px;
+  font-weight: bold;
+  border-radius: 2px;
 }
 
 .pics-meta {
-  padding: 15px;
-  display: flex;
-  justify-content: space-between;
-  font-size: 10px;
-  color: #666;
-  border-top: 1px solid var(--pixels-grey);
+  padding: 8px;
 }
 
-.pics-footer {
-  margin-top: 100px;
-  padding-top: 40px;
-  border-top: 1px solid var(--pixels-grey);
-  text-align: center;
-  font-size: 10px;
-  color: #444;
+.pics-meta h3 {
+  font-size: 14px;
+  margin: 0 0 5px;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* Mobile Adjustments */
-@media (max-width: 768px) {
-  .pics-header h1 {
-    font-size: 24px;
+.pics-meta .stats {
+  font-size: 11px;
+  color: #888;
+}
+
+.copy-btn {
+  background: #444;
+  border: none;
+  color: #fff;
+  font-size: 10px;
+  padding: 4px 8px;
+  border-radius: 2px;
+  margin-top: 5px;
+  cursor: pointer;
+}
+
+.copy-btn:hover {
+  background: var(--portal-orange);
+  color: #000;
+}
+
+/* Mobile Overrides */
+@media (max-width: 600px) {
+  .pics-gallery {
+    grid-template-columns: 1fr;
+    padding: 10px;
+  }
+  
+  .camera-render {
+    font-size: 4px; /* Even higher density for mobile */
   }
 }
