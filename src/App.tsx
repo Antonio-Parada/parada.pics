@@ -1,6 +1,24 @@
 import CameraMedium from './CameraMedium'
 import './App.css'
 
+const galleryImages = [
+  { id: '001', name: 'IMG_001.RAW' },
+  { id: '002', name: 'IMG_002.RAW' },
+  { id: '003', name: 'IMG_003.RAW' },
+  { id: '004', name: 'IMG_004.RAW' },
+  { id: '005', name: 'IMG_005.RAW' },
+  { id: '006', name: 'IMG_006.RAW' },
+  { id: '007', name: 'IMG_007.RAW' },
+  { id: '008', name: 'IMG_008.RAW' },
+  { id: '009', name: 'IMG_009.RAW' },
+  { id: '010', name: 'IMG_010.RAW' },
+  { id: '011', name: 'IMG_011.RAW' },
+  { id: '012', name: 'IMG_012.RAW' },
+  { id: '013', name: 'IMG_013.RAW' },
+  { id: '014', name: 'IMG_014.RAW' },
+  { id: '015', name: 'IMG_015.RAW' },
+];
+
 function App() {
   return (
     <div className="pics-container">
@@ -10,27 +28,18 @@ function App() {
       </header>
 
       <main className="pics-gallery">
-        <div className="pics-item">
-          <CameraMedium 
-            imageSrc="https://images.unsplash.com/photo-1493246507139-91e8fad9978e?auto=format&fit=crop&w=800&q=80" 
-            targetWidth={100}
-          />
-          <div className="pics-meta">
-            <span>IMAGE_001.RAW</span>
-            <span>COMPILED_VIA_PRETEXT</span>
+        {galleryImages.map((img) => (
+          <div key={img.id} className="pics-item">
+            <CameraMedium 
+              imageSrc={`/gallery/img_${img.id}.jpg`} 
+              targetWidth={120}
+            />
+            <div className="pics-meta">
+              <span>{img.name}</span>
+              <span>COMPILED_VIA_PRETEXT // LUMINANCE_MAP_ACTIVE</span>
+            </div>
           </div>
-        </div>
-
-        <div className="pics-item">
-          <CameraMedium 
-            imageSrc="https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=800&q=80" 
-            targetWidth={100}
-          />
-          <div className="pics-meta">
-            <span>IMAGE_002.RAW</span>
-            <span>LUMINANCE_MAP_ACTIVE</span>
-          </div>
-        </div>
+        ))}
       </main>
 
       <footer className="pics-footer">
