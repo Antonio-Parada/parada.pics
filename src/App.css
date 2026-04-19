@@ -46,6 +46,33 @@ body {
 .pics-item {
   border: 1px solid var(--pixels-grey);
   background-color: #050505;
+  position: relative;
+  overflow: hidden;
+}
+
+.camera-render {
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
+  transition: text-shadow 0.3s ease;
+}
+
+.pics-item:hover .camera-render {
+  text-shadow: 0 0 8px rgba(0, 255, 0, 0.4);
+  color: var(--pixels-green) !important;
+}
+
+/* Scanline Effect */
+.pics-item::after {
+  content: " ";
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
+  z-index: 2;
+  background-size: 100% 2px, 3px 100%;
+  pointer-events: none;
 }
 
 .pics-meta {

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-// @ts-ignore - Pretext might not have official types yet
+// @ts-ignore
 import * as Pretext from '@chenglou/pretext';
 import { processImage, getCharForLuminance, type PixelMap } from './ImageProcessor';
 
@@ -8,7 +8,7 @@ interface CameraMediumProps {
   targetWidth?: number;
 }
 
-const CameraMedium: React.FC<CameraMediumProps> = ({ imageSrc, targetWidth = 120 }) => {
+const CameraMedium: React.FC<CameraMediumProps> = ({ imageSrc, targetWidth = 160 }) => {
   const [ascii, setAscii] = useState<string>('');
   const [layoutHeight, setLayoutHeight] = useState<number>(0);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -18,7 +18,8 @@ const CameraMedium: React.FC<CameraMediumProps> = ({ imageSrc, targetWidth = 120
     img.crossOrigin = "Anonymous";
     img.src = imageSrc;
     img.onload = async () => {
-      const pixels: PixelMap = await processImage(img, targetWidth);
+      // Increased contrast to 1.3 for sharper edges
+      const pixels: PixelMap = await processImage(img, targetWidth, 1.3);
       let asciiStr = '';
       for (let y = 0; y < pixels.height; y++) {
         for (let x = 0; x < pixels.width; x++) {
@@ -33,17 +34,16 @@ const CameraMedium: React.FC<CameraMediumProps> = ({ imageSrc, targetWidth = 120
   useEffect(() => {
     if (!ascii || !containerRef.current) return;
 
-    // Use Pretext to calculate layout high-speed
     try {
       const prepared = Pretext.prepare(
         ascii, 
-        "12px 'Courier New', Courier, monospace"
+        "10px 'Courier New', Courier, monospace"
       );
 
       const layout = Pretext.layout(
         prepared, 
         containerRef.current.clientWidth, 
-        12 // lineHeight
+        10 // Matches font size for tight line spacing
       );
       
       setLayoutHeight(layout.height);
@@ -55,18 +55,19 @@ const CameraMedium: React.FC<CameraMediumProps> = ({ imageSrc, targetWidth = 120
   return (
     <div 
       ref={containerRef}
+      className="camera-render"
       style={{
         fontFamily: "'Courier New', Courier, monospace",
-        fontSize: '12px',
+        fontSize: '10px',
         lineHeight: '1',
         whiteSpace: 'pre',
         backgroundColor: '#000',
         color: '#fff',
-        padding: '20px',
         width: '100%',
         minHeight: layoutHeight || 'auto',
         overflow: 'hidden',
-        textAlign: 'center'
+        textAlign: 'center',
+        padding: '20px 0'
       }}
     >
       {ascii}

@@ -4,14 +4,22 @@ export interface PixelMap {
   height: number;
 }
 
-export const processImage = (img: HTMLImageElement, width: number = 100): Promise<PixelMap> => {
+export const processImage = (
+  img: HTMLImageElement, 
+  width: number = 120, 
+  contrast: number = 1.2
+): Promise<PixelMap> => {
   return new Promise((resolve) => {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const scale = width / img.width;
-    const height = Math.floor(img.height * scale);
+    // ACCOUNT FOR FONT ASPECT RATIO
+    // Monospace chars are usually ~1:2 ratio (height is 2x width)
+    // To prevent vertical stretching, we double the horizontal sampling or halve the vertical
+    const fontAspectRatio = 0.55; 
+    const height = Math.floor((img.height / img.width) * width * fontAspectRatio);
+    
     canvas.width = width;
     canvas.height = height;
 
@@ -23,9 +31,20 @@ export const processImage = (img: HTMLImageElement, width: number = 100): Promis
       const row: number[] = [];
       for (let x = 0; x < width; x++) {
         const i = (y * width + x) * 4;
-        // Greyscale conversion (Luminance)
-        const avg = (imageData[i] + imageData[i + 1] + imageData[i + 2]) / 3;
-        row.push(avg);
+        
+        // PERCEPTUAL LUMINANCE (Rec. 709)
+        let r = imageData[i];
+        let g = imageData[i + 1];
+        let b = imageData[i + 2];
+        
+        let luminance = (0.2126 * r + 0.7152 * g + 0.0722 * b);
+
+        // CONTRAST ENHANCEMENT
+        // Boosts highs and drops lows to sharpen the ASCII threshold
+        luminance = ((luminance / 255 - 0.5) * contrast + 0.5) * 255;
+        luminance = Math.max(0, Math.min(255, luminance));
+
+        row.push(luminance);
       }
       data.push(row);
     }
@@ -35,8 +54,8 @@ export const processImage = (img: HTMLImageElement, width: number = 100): Promis
 };
 
 export const getCharForLuminance = (l: number): string => {
-  // Classic ASCII density map
-  const chars = "@%#*+=-:. ";
-  const index = Math.floor((l / 255) * (chars.length - 1));
+  // EXTENDED DENSITY MAP for finer gradients
+  const chars = "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\\|()1{}[]?-_+~<>i!lI;:,\"^`'. ";
+  const index = Math.floor(((255 - l) / 255) * (chars.length - 1));
   return chars[index];
 };
