@@ -7,8 +7,8 @@ function App() {
   const [isPhosphor, setIsPhosphor] = useState(false);
   const [category, setCategory] = useState<'PUBLIC' | 'PRIVATE'>('PUBLIC');
   const [isAuthorized, setIsAuthorized] = useState(false);
+  const [attemptCount, setAttemptCount] = useState(0);
 
-  // Persistence: Check if already authorized on mount
   useEffect(() => {
     const auth = localStorage.getItem('pixels_authorized');
     if (auth === 'true') {
@@ -20,13 +20,21 @@ function App() {
     if (isAuthorized) {
       setCategory('PRIVATE');
     } else {
-      const password = prompt('ENTER ACCESS KEY:');
-      if (password === 'pixels2026') { // Placeholder password
+      const currentAttempt = attemptCount + 1;
+      setAttemptCount(currentAttempt);
+
+      prompt(`ENTER ACCESS KEY [ATTEMPT 0${currentAttempt}]:`);
+
+      // NARRATIVE LOGIC: 
+      // First attempt always fails. 
+      // Second attempt (or higher) always succeeds.
+      if (currentAttempt >= 2) {
         localStorage.setItem('pixels_authorized', 'true');
         setIsAuthorized(true);
         setCategory('PRIVATE');
+        alert('SIGNAL DECRYPTED. ACCESS GRANTED.');
       } else {
-        alert('ACCESS DENIED: INVALID KEY');
+        alert('ACCESS DENIED: HANDSHAKE FAILED. RETRYING...');
       }
     }
   };
@@ -55,8 +63,6 @@ function App() {
     }
   };
 
-  // Logic: Display even IDs as Public, odd as Private for demonstration
-  // In the future, you can add a 'category' field to your compiler.py
   const filteredData = galleryData.filter((_, index) => {
     if (category === 'PUBLIC') return index % 2 === 0;
     return index % 2 !== 0;
@@ -90,7 +96,7 @@ function App() {
           PRIVATE_ENCLAVE {isAuthorized ? '✓' : '🔒'}
         </span>
         <span style={{marginLeft: 'auto', color: 'var(--pixels-cyan)'}}>
-          MODE: {category}
+          SIGNAL_STATUS: {isAuthorized ? 'DECRYPTED' : 'LOCKED'}
         </span>
       </nav>
 
