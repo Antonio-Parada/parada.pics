@@ -7,17 +7,26 @@
   --pixels-text-dim: #888;
 }
 
-body {
+/* Aggressive Reset to kill horizontal scroll */
+html, body {
   margin: 0;
   padding: 0;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
   background-color: var(--pixels-bg);
+}
+
+body {
   color: #fff;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  overflow-x: hidden;
 }
 
 .pics-container {
   width: 100%;
+  max-width: 100vw;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Header */
@@ -32,6 +41,8 @@ body {
   top: 0;
   z-index: 100;
   backdrop-filter: blur(10px);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .pics-header h1 {
@@ -58,15 +69,13 @@ body {
   border-bottom: 1px solid var(--pixels-border);
   overflow-x: auto;
   white-space: nowrap;
-  scrollbar-width: none; /* Hide scrollbar for clean look */
+  scrollbar-width: none;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .category-bar::-webkit-scrollbar {
   display: none;
-}
-
-.category-bar span {
-  cursor: pointer;
 }
 
 /* Gallery Grid */
@@ -75,6 +84,8 @@ body {
   flex-direction: column;
   gap: 1px;
   background-color: var(--pixels-border);
+  width: 100%;
+  max-width: 100vw;
 }
 
 .pics-item {
@@ -82,11 +93,13 @@ body {
   display: flex;
   flex-direction: column;
   width: 100%;
+  max-width: 100vw;
+  overflow: hidden;
 }
 
 .camera-render {
   font-family: 'Courier New', Courier, monospace;
-  font-size: 0.65vw; /* Fluid font size to fit width exactly */
+  font-size: 0.62vw; /* Fluid font size to fit width perfectly */
   line-height: 1;
   white-space: pre;
   background-color: #000;
@@ -96,6 +109,7 @@ body {
   display: block;
   text-align: center;
   padding: 10px 0;
+  box-sizing: border-box;
 }
 
 .pics-meta {
@@ -105,6 +119,8 @@ body {
   justify-content: space-between;
   align-items: center;
   border-top: 1px solid var(--pixels-border);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .meta-info h3 {
@@ -129,18 +145,18 @@ body {
   cursor: pointer;
 }
 
+.pics-footer {
+  padding: 40px 20px;
+  text-align: center;
+  border-top: 1px solid var(--pixels-border);
+  width: 100%;
+  box-sizing: border-box;
+}
+
 /* Mobile Overrides */
 @media (max-width: 800px) {
   .camera-render {
-    font-size: 0.62vw; /* Tighter for mobile to ensure no overflow */
+    font-size: 0.58vw; /* Slightly smaller to guarantee no scroll */
     padding: 5px 0;
-  }
-  
-  .pics-meta {
-    padding: 10px 15px;
-  }
-  
-  .pics-header {
-    padding: 10px 15px;
   }
 }
