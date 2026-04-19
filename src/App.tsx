@@ -1,76 +1,77 @@
 import { useState, useEffect } from 'react'
+import { BrowserRouter as Router, Routes, Route, Link, useLocation, useNavigate, Navigate } from 'react-router-dom'
 import CameraMedium from './CameraMedium'
 import './App.css'
 import galleryData from './gallery_compiled.json'
 
-function App() {
-  const [isPhosphor, setIsPhosphor] = useState(false);
-  const [category, setCategory] = useState<'PUBLIC' | 'PRIVATE'>('PUBLIC');
-  const [isAuthorized, setIsAuthorized] = useState(false);
+// Sub-component for the Gallery view to handle category logic
+function GalleryView({ type, isAuthorized, onAuthorize }: { type: 'PUBLIC' | 'PRIVATE', isAuthorized: boolean, onAuthorize: () => void }) {
+  const navigate = useNavigate();
   const [attemptCount, setAttemptCount] = useState(0);
 
+  // Filter ONLY by the specific category from the JSON database
+  const filteredData = galleryData.filter(img => img.category === type);
+
   useEffect(() => {
-    const auth = localStorage.getItem('pixels_authorized');
-    if (auth === 'true') {
+    if (type === 'PRIVATE' && !isAuthorized) {
+      const currentAttempt = attemptCount + 1;
+      setAttemptCount(currentAttempt);
+      
+      prompt(`ENTER ACCESS KEY [ATTEMPT 0${currentAttempt}]:`);
+
+      if (currentAttempt >= 2) {
+        onAuthorize();
+        alert('SIGNAL DECRYPTED. ACCESS GRANTED.');
+      } else {
+        alert('ACCESS DENIED: HANDSHAKE FAILED. RETRYING...');
+        navigate('/'); // Bounce back to public on first failure
+      }
+    }
+  }, [type, isAuthorized, navigate, attemptCount, onAuthorize]);
+
+  if (type === 'PRIVATE' && !isAuthorized) return null;
+
+  return (
+    <main className="pics-gallery">
+      {filteredData.length > 0 ? (
+        filteredData.map((img, index) => (
+          <CameraMedium 
+            key={img.id}
+            ascii={img.ascii} 
+            name={img.name}
+            index={index + 1}
+            type={type}
+          />
+        ))
+      ) : (
+        <div style={{padding: '100px', textAlign: 'center', width: '100%', color: '#444'}}>
+          NO_SIGNALS_ARCHIVED_IN_{type}_ENCLAVE
+        </div>
+      )}
+    </main>
+  );
+}
+
+function AppContent() {
+  const [isPhosphor, setIsPhosphor] = useState(false);
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const location = useLocation();
+
+  useEffect(() => {
+    if (localStorage.getItem('pixels_authorized') === 'true') {
       setIsAuthorized(true);
     }
   }, []);
 
-  const handlePrivateClick = () => {
-    if (isAuthorized) {
-      setCategory('PRIVATE');
-    } else {
-      const currentAttempt = attemptCount + 1;
-      setAttemptCount(currentAttempt);
-
-      prompt(`ENTER ACCESS KEY [ATTEMPT 0${currentAttempt}]:`);
-
-      // NARRATIVE LOGIC: 
-      // First attempt always fails. 
-      // Second attempt (or higher) always succeeds.
-      if (currentAttempt >= 2) {
-        localStorage.setItem('pixels_authorized', 'true');
-        setIsAuthorized(true);
-        setCategory('PRIVATE');
-        alert('SIGNAL DECRYPTED. ACCESS GRANTED.');
-      } else {
-        alert('ACCESS DENIED: HANDSHAKE FAILED. RETRYING...');
-      }
-    }
+  const handleAuthorize = () => {
+    localStorage.setItem('pixels_authorized', 'true');
+    setIsAuthorized(true);
   };
-
-  const copyToClipboard = (text: string) => {
-    if (navigator.clipboard && window.isSecureContext) {
-      navigator.clipboard.writeText(text).then(() => {
-        alert('Signal Copied to Buffer.');
-      });
-    } else {
-      const textArea = document.createElement("textarea");
-      textArea.value = text;
-      textArea.style.position = "fixed";
-      textArea.style.left = "-999999px";
-      textArea.style.top = "-999999px";
-      document.body.appendChild(textArea);
-      textArea.focus();
-      textArea.select();
-      try {
-        document.execCommand('copy');
-        alert('Signal Copied to Buffer (Fallback).');
-      } catch (err) {
-        console.error('Unable to copy', err);
-      }
-      document.body.removeChild(textArea);
-    }
-  };
-
-  const filteredData = galleryData.filter((img) => {
-    return img.category === category;
-  });
 
   return (
     <div className="pics-container">
       <header className="pics-header">
-        <h1>PARADA<span>.PICS</span></h1>
+        <Link to="/" style={{textDecoration: 'none'}}><h1>PARADA<span>.PICS</span></h1></Link>
         <div className="header-actions">
           <button 
             className={`color-btn ${isPhosphor ? 'active' : ''}`} 
@@ -82,54 +83,38 @@ function App() {
       </header>
 
       <nav className="category-bar">
-        <span 
-          className={category === 'PUBLIC' ? 'active' : ''} 
-          onClick={() => setCategory('PUBLIC')}
-        >
-          PUBLIC_SIGNALS
-        </span>
-        <span 
-          className={category === 'PRIVATE' ? 'active' : ''} 
-          onClick={handlePrivateClick}
-        >
-          PRIVATE_ENCLAVE {isAuthorized ? '✓' : '🔒'}
-        </span>
+        <Link to="/" className={location.pathname === '/' ? 'active' : ''}>
+          <span>PUBLIC_SIGNALS</span>
+        </Link>
+        <Link to="/private" className={location.pathname === '/private' ? 'active' : ''}>
+          <span>PRIVATE_ENCLAVE {isAuthorized ? '✓' : '🔒'}</span>
+        </Link>
         <span style={{marginLeft: 'auto', color: 'var(--pixels-cyan)'}}>
-          SIGNAL_STATUS: {isAuthorized ? 'DECRYPTED' : 'LOCKED'}
+          NODE_PATH: {location.pathname.toUpperCase()}
         </span>
       </nav>
 
-      <main className="pics-gallery">
-        {filteredData.map((img, index) => (
-          <div key={img.id} className="pics-item">
-            <CameraMedium 
-              ascii={img.ascii} 
-              isPhosphor={isPhosphor}
-            />
-            
-            <div className="pics-meta">
-              <div className="meta-info">
-                <h3>{img.name.replace('.JPG', '')}</h3>
-                <p>BLOCK_ARRAY_0{index + 1} // {category}_SIGNAL</p>
-              </div>
-              <div className="action-btns">
-                <button 
-                  className="copy-btn" 
-                  onClick={() => copyToClipboard(img.ascii)}
-                >
-                  COPY_SIGNAL
-                </button>
-              </div>
-            </div>
-          </div>
-        ))}
-      </main>
+      <div className={isPhosphor ? 'phosphor-apply' : ''}>
+        <Routes>
+          <Route path="/" element={<GalleryView type="PUBLIC" isAuthorized={isAuthorized} onAuthorize={handleAuthorize} />} />
+          <Route path="/private" element={<GalleryView type="PRIVATE" isAuthorized={isAuthorized} onAuthorize={handleAuthorize} />} />
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
+      </div>
 
       <footer className="pics-footer">
         <p>© 2026 PIXELS AGENCY // ARCHITECT: PARADA</p>
         <p style={{fontSize: '10px', color: '#444', marginTop: '10px'}}>TRANSCRIBING THE VOID INTO TEXT.</p>
       </footer>
     </div>
+  )
+}
+
+function App() {
+  return (
+    <Router>
+      <AppContent />
+    </Router>
   )
 }
 

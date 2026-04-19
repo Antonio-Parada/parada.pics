@@ -74,8 +74,13 @@ body {
   box-sizing: border-box;
 }
 
-.category-bar::-webkit-scrollbar {
-  display: none;
+.category-bar a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.category-bar a.active span {
+  color: var(--pixels-cyan);
 }
 
 /* Gallery Grid */
@@ -99,7 +104,7 @@ body {
 
 .camera-render {
   font-family: 'Courier New', Courier, monospace;
-  font-size: 0.62vw; /* Fluid font size to fit width perfectly */
+  font-size: 0.62vw;
   line-height: 1;
   white-space: pre;
   background-color: #000;
@@ -110,6 +115,12 @@ body {
   text-align: center;
   padding: 10px 0;
   box-sizing: border-box;
+}
+
+/* Phosphor Apply Class */
+.phosphor-apply .camera-render {
+  color: var(--pixels-green) !important;
+  text-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
 }
 
 .pics-meta {
@@ -145,6 +156,11 @@ body {
   cursor: pointer;
 }
 
+.color-btn.active {
+  border-color: var(--pixels-green);
+  color: var(--pixels-green);
+}
+
 .pics-footer {
   padding: 40px 20px;
   text-align: center;
@@ -156,7 +172,7 @@ body {
 /* Mobile Overrides */
 @media (max-width: 800px) {
   .camera-render {
-    font-size: 0.58vw; /* Slightly smaller to guarantee no scroll */
+    font-size: 0.58vw;
     padding: 5px 0;
   }
 }
