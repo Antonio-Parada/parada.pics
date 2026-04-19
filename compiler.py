@@ -4,14 +4,15 @@ import math
 from PIL import Image, ImageStat, ImageEnhance
 
 def get_char_for_luminance(l):
-    # "$" ONLY DENSITY MAP
-    return "$" if l > 127 else " "
+    # RESTORED DETAILED RAMP
+    chars = "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\\|()1{}[]?-_+~<>i!lI;:,\"^`'. "
+    index = int(((255 - l) / 255) * (len(chars) - 1))
+    index = max(0, min(len(chars) - 1, index))
+    return chars[index]
 
 def compile_image_to_ascii(image_path, width=160):
     img = Image.open(image_path).convert('RGB')
     
-    # Perceptual aspect ratio correction
-    # $ sign is significantly taller than wide
     font_aspect_ratio = 0.55
     height = int((img.height / img.width) * width * font_aspect_ratio)
     img = img.resize((width, height), Image.Resampling.LANCZOS)

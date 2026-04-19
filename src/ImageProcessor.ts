@@ -13,8 +13,6 @@ export const processImage = (
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // MONOSPACE ASPECT CORRECTION
-    // $ sign is roughly 0.6 as wide as it is tall
     const fontAspectRatio = 0.55; 
     const height = Math.floor((img.height / img.width) * width * fontAspectRatio);
     
@@ -60,8 +58,13 @@ export const processImage = (
   });
 };
 
-export const getCharForLuminance = (l: number): string => {
-  // "$" ONLY DENSITY MAP
-  // Using space for zero-light and "$" for light to create high-contrast pointillism
-  return l > 127 ? "$" : " ";
+export const getCharForLuminance = (l: number, useDollarsOnly: boolean = false): string => {
+  if (useDollarsOnly) {
+    return l > 127 ? "$" : " ";
+  }
+  
+  // RESTORED SHADING RAMP
+  const chars = "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\\|()1{}[]?-_+~<>i!lI;:,\"^`'. ";
+  const index = Math.floor(((255 - l) / 255) * (chars.length - 1));
+  return chars[index];
 };
